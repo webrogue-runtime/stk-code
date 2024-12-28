@@ -131,8 +131,8 @@ void loadServerConfig(const std::string& path)
     }
     m_server_uid = StringUtils::removeExtension(
         StringUtils::getBasename(g_server_config_path));
-    const XMLNode* root = file_manager->createXMLTree(g_server_config_path);
-    loadServerConfigXML(root, default_config);
+    // const XMLNode* root = file_manager->createXMLTree(g_server_config_path);
+    loadServerConfigXML(nullptr, default_config);
 }   // loadServerConfig
 
 // ----------------------------------------------------------------------------

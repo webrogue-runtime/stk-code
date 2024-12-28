@@ -3,6 +3,7 @@
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
 #include "IrrCompileConfig.h"
+#include <iostream>
 
 //static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
 
@@ -127,47 +128,13 @@ namespace irr
 #ifdef SERVER_ONLY
 		dev = new CIrrDeviceServer(creation_params);
 #endif
-
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-		if (creation_params.DeviceType == EIDT_WIN32 || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceWin32(creation_params);
-#endif
-
-#ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
-		if (creation_params.DeviceType == EIDT_OSX || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceMacOSX(creation_params);
-#endif
-
-#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
-		if (creation_params.DeviceType == EIDT_WAYLAND || (!dev && creation_params.DeviceType == EIDT_BEST))
-		{
-			if (CIrrDeviceWayland::isWaylandDeviceWorking())
-			{
-				dev = new CIrrDeviceWayland(creation_params);
-				
-				if (!dev->getVideoDriver())
-				{
-					delete dev;
-					dev = NULL;
-				}
-			}
-		}
-#endif
-
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-		if (creation_params.DeviceType == EIDT_X11 || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceLinux(creation_params);
-#endif
-
+	std::cerr << "createDevice 1\n";
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+	std::cerr << "createDevice 2\n";
 		if (creation_params.DeviceType == EIDT_SDL || (!dev && creation_params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceSDL(creation_params);
 #endif
-
-#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
-		if (creation_params.DeviceType == EIDT_ANDROID || (!dev && creation_params.DeviceType == EIDT_BEST))
-			dev = new CIrrDeviceAndroid(creation_params);
-#endif
+	std::cerr << "createDevice 3\n";
 
 		if (dev && !dev->getVideoDriver() && creation_params.DriverType != video::EDT_NULL)
 		{

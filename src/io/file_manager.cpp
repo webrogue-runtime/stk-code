@@ -268,7 +268,7 @@ FileManager::FileManager()
     checkAndCreateCachedTexturesDir();
     checkAndCreateGPDir();
 
-    redirectOutput();
+    // redirectOutput();
 }   // FileManager
 
 // ----------------------------------------------------------------------------

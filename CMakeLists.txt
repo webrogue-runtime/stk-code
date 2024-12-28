@@ -115,6 +115,8 @@ if(UNIX AND NOT APPLE)
     option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_ENABLE_CXX17_REMOVED_RANDOM_SHUFFLE")
+
 if(USE_ASAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
@@ -679,6 +681,9 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${MCPP_LIBRARY}
+    /wasix-sysroot/lib/wasm32-wasi/libc++abi.a
+    /wasix-sysroot/lib/wasm32-wasi/libc++experimental.a
+    /host_dir/examples/dest/lib/libwebrogue_gfx.a
     )
 
 if (USE_SWITCH)
@@ -736,7 +741,7 @@ endif()
 if (USE_CRYPTO_OPENSSL)
     target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})
 else()
-    target_link_libraries(supertuxkart ${MBEDCRYPTO_LIBRARY})
+    target_link_libraries(supertuxkart ${MBEDTLS_LIBRARY} ${MBEDX509_LIBRARY} ${MBEDCRYPTO_LIBRARY})
 endif()
 
 if(NOT SERVER_ONLY)

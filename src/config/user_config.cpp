@@ -669,7 +669,7 @@ UserConfig::~UserConfig()
 bool UserConfig::loadConfig()
 {
     const std::string filename = file_manager->getUserConfigFile(m_filename);
-    auto root = std::unique_ptr<XMLNode>(file_manager->createXMLTree(filename));
+    auto root = std::unique_ptr<XMLNode>(nullptr); // file_manager->createXMLTree(filename)
     if(!root || root->getName() != "stkconfig")
     {
         Log::info("UserConfig",

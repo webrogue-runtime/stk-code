@@ -341,6 +341,8 @@ bool SocketAddress::isPublicAddressLocalhost() const
             return htonl(currentIp) == getIP();
     }
     return false;
+#elif defined(__wasi__)
+    return false;
 #elif !defined(WIN32)
     struct ifaddrs *addresses, *p;
 

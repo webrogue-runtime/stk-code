@@ -23,7 +23,6 @@
 #ifndef IOS_STK
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
-#include <EGL/egl.h>
 #endif
 
 namespace

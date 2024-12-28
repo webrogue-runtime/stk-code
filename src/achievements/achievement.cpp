@@ -31,7 +31,24 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <cstdlib>
 #include <stdlib.h>
+#include <cstdio>
+
+extern "C" void *__cxa_allocate_exception(size_t thrown_size) throw() {
+    printf("__cxa_allocate_exception\n");
+    size_t actual_size = thrown_size+1024;
+    void* result = malloc(actual_size);
+    ::memset(result, 0, actual_size);
+    
+    return ((char*)result)+512;
+}
+
+extern "C" void __cxa_throw(void *thrown_object, std::type_info *tinfo, void (*dest)(void *)) {
+    printf("__cxa_throw\n");
+    __builtin_unreachable();
+    abort();
+}
 
 /** Constructur, initialises this object with the data from the
  *  corresponding AchievementInfo.

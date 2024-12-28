@@ -17,6 +17,7 @@ namespace irr
 CIrrDeviceServer::CIrrDeviceServer(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param)
 {
+	throw 1;
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceServer");
 	#endif

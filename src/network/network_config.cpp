@@ -59,7 +59,7 @@
 #  include <netdb.h>
 #  include <netinet/in.h>
 #ifndef __SWITCH__
-#  include <resolv.h>
+// #  include <resolv.h>
 #endif
 #endif
 #endif
@@ -667,6 +667,7 @@ cleanup:
     free(quest);
     dns_so_close(so);
     dns_resconf_close(conf);
+#elif defined(__wasi__)
 #else
 #define SRV_WEIGHT (RRFIXEDSZ+2)
 #define SRV_PORT (RRFIXEDSZ+4)

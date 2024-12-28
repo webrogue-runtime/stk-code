@@ -97,6 +97,7 @@ const char* wmDeleteWindow = "WM_DELETE_WINDOW";
 //! constructor
 CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
+	throw 1;
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
 	XInputMethod(0), XInputContext(0), m_font_set(0), numlock_mask(0),

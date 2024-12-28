@@ -832,6 +832,7 @@ bool CIrrDeviceWayland::isWaylandDeviceWorking()
 CIrrDeviceWayland::CIrrDeviceWayland(const SIrrlichtCreationParameters& params)
     : CIrrDeviceStub(params)
 {
+	throw 1;
     m_compositor = NULL;
     m_cursor = NULL;
     m_cursor_theme = NULL;

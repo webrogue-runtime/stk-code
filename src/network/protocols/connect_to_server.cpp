@@ -65,7 +65,7 @@
 #  include <netdb.h>
 #  include <netinet/in.h>
 #ifndef __SWITCH__
-#  include <resolv.h>
+// #  include <resolv.h>
 #endif
 #endif
 #endif
@@ -795,6 +795,8 @@ cleanup:
     dns_so_close(so);
     dns_resconf_close(conf);
 
+#elif __wasi__
+    return false;
 #else
     const std::string& utf8name = StringUtils::wideToUtf8(m_server->getName());
     unsigned char response[512] = {};

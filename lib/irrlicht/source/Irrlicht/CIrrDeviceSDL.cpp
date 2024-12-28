@@ -72,6 +72,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	GyroscopeIndex(-1), GyroscopeInstance(-1), NativeScaleX(1.0f),
 	NativeScaleY(1.0f)
 {
+	throw 1;
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceSDL");
 	#endif

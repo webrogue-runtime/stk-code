@@ -23,6 +23,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/vec3.hpp"
 
+#include <iostream>
 #include <stdexcept>
 
 XMLNode::XMLNode(io::IXMLReader *xml)
@@ -39,12 +40,14 @@ XMLNode::XMLNode(io::IXMLReader *xml)
  */
 XMLNode::XMLNode(const std::string &filename)
 {
+        std::cout<<"XMLNode::XMLNode("+filename<<'\n';
     m_file_name = filename;
 
     io::IXMLReader *xml = file_manager->createXMLReader(filename);
     
     if (xml == NULL)
     {
+        std::cout<<"Cannot find file "+filename<<'\n';
         throw std::runtime_error("Cannot find file "+filename);
     }
 
