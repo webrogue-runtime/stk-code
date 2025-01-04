@@ -233,21 +233,21 @@ IImage* CImageLoaderJPG::loadImage(io::IReadFile* file, bool skip_checking) cons
 	// compatibility fudge:
 	// we need to use setjmp/longjmp for error handling as gcc-linux
 	// crashes when throwing within external c code
-	if (setjmp(jerr.setjmp_buffer))
-	{
-		// If we get here, the JPEG code has signaled an error.
-		// We need to clean up the JPEG object and return.
+	// if (setjmp(jerr.setjmp_buffer))
+	// {
+	// 	// If we get here, the JPEG code has signaled an error.
+	// 	// We need to clean up the JPEG object and return.
 
-		jpeg_destroy_decompress(&cinfo);
+	// 	jpeg_destroy_decompress(&cinfo);
 
-		delete [] input;
-		// if the row pointer was created, we delete it.
-		if (rowPtr)
-			delete [] rowPtr;
+	// 	delete [] input;
+	// 	// if the row pointer was created, we delete it.
+	// 	if (rowPtr)
+	// 		delete [] rowPtr;
 
-		// return null pointer
-		return 0;
-	}
+	// 	// return null pointer
+	// 	return 0;
+	// }
 
 	// Now we can initialize the JPEG decompression object.
 	jpeg_create_decompress(&cinfo);

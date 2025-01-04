@@ -35,7 +35,7 @@ IImageWriter* createImageWriterPNG()
 static void png_cpexcept_error(png_structp png_ptr, png_const_charp msg)
 {
 	os::Printer::log("PNG fatal error", msg, ELL_ERROR);
-	longjmp(png_jmpbuf(png_ptr), 1);
+	// longjmp(png_jmpbuf(png_ptr), 1);
 }
 
 // PNG function for warning handling
@@ -98,11 +98,11 @@ bool CImageWriterPNG::writeImage(io::IWriteFile* file, IImage* image,u32 param) 
 	}
 
 	// for proper error handling
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return false;
-	}
+	// if (setjmp(png_jmpbuf(png_ptr)))
+	// {
+	// 	png_destroy_write_struct(&png_ptr, &info_ptr);
+	// 	return false;
+	// }
 
 	png_set_write_fn(png_ptr, file, user_write_data_fcn, NULL);
 
@@ -189,13 +189,13 @@ bool CImageWriterPNG::writeImage(io::IWriteFile* file, IImage* image,u32 param) 
 		data += lineWidth;
 	}
 	// for proper error handling
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		delete [] RowPointers;
-		delete [] tmpImage;
-		return false;
-	}
+	// if (setjmp(png_jmpbuf(png_ptr)))
+	// {
+	// 	png_destroy_write_struct(&png_ptr, &info_ptr);
+	// 	delete [] RowPointers;
+	// 	delete [] tmpImage;
+	// 	return false;
+	// }
 
 	png_set_rows(png_ptr, info_ptr, RowPointers);
 

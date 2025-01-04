@@ -28,7 +28,7 @@ namespace video
 static void png_cpexcept_error(png_structp png_ptr, png_const_charp msg)
 {
 	printf("PNG fatal error: %s\n", msg);
-	longjmp(png_jmpbuf(png_ptr), 1);
+	// longjmp(png_jmpbuf(png_ptr), 1);
 }
 
 // PNG function for warning handling
@@ -119,14 +119,14 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking) cons
 		return 0;
 	}
 
-	// for proper error handling
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
-		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-		if (RowPointers)
-			delete [] RowPointers;
-		return 0;
-	}
+	// // for proper error handling
+	// if (setjmp(png_jmpbuf(png_ptr)))
+	// {
+	// 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+	// 	if (RowPointers)
+	// 		delete [] RowPointers;
+	// 	return 0;
+	// }
 
 	// changed by zola so we don't need to have public FILE pointers
 	png_set_read_fn(png_ptr, file, user_read_data_fcn);
@@ -229,14 +229,14 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking) cons
 	}
 
 	// for proper error handling
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
-		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-		delete [] RowPointers;
-		image->unlock();
-		delete image;
-		return 0;
-	}
+	// if (setjmp(png_jmpbuf(png_ptr)))
+	// {
+	// 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+	// 	delete [] RowPointers;
+	// 	image->unlock();
+	// 	delete image;
+	// 	return 0;
+	// }
 
 	// Read data using the library function that handles all transformations including interlacing
 	png_read_image(png_ptr, RowPointers);
