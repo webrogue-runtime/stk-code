@@ -123,8 +123,10 @@ int scanhead (FILE * infile, unsigned * image_width, unsigned * image_height) {
         // public jpeg error fields
         struct jpeg_error_mgr pub;
 
+#ifndef __wasi__
         // for longjmp, to return to caller on a fatal error
         jmp_buf setjmp_buffer;
+#endif
     };
 
 void CImageLoaderJPG::init_source (j_decompress_ptr cinfo)
@@ -172,7 +174,9 @@ void CImageLoaderJPG::error_exit (j_common_ptr cinfo)
 	// cinfo->err really points to a irr_error_mgr struct
 	irr_jpeg_error_mgr *myerr = (irr_jpeg_error_mgr*) cinfo->err;
 
+#ifndef __wasi__
 	longjmp(myerr->setjmp_buffer, 1);
+#endif
 }
 
 

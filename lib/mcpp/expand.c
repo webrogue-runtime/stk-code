@@ -2123,7 +2123,13 @@ static char *   insert_to_bptr(
  *  M a c r o   E x p a n s i o n   i n   P R E - S T A N D A R D   M o d e
  */
 
+#ifndef __wasi__
 #include    "setjmp.h"
+#else
+#define jmp_buf void*
+#define setjmp(x) 0
+#define longjmp(x, y) __builtin_unreachable()
+#endif
 
 static jmp_buf  jump;
 

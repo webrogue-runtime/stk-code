@@ -43,7 +43,9 @@
 #  include <sys/socket.h>
 #endif
 
+#if !defined(__wasi__)
 #include <signal.h>
+#endif
 
 Synchronised<FILE*>Network::m_log_file;
 bool Network::m_connection_debug = false;
@@ -83,6 +85,7 @@ Network::Network(int peer_count, int channel_limit,
         struct sockaddr_storage ss;
         memset(&ss, 0, sizeof (struct sockaddr_storage));
         socklen_t len = sizeof(ss);
+#if !defined(__wasi__)
         if (getsockname(m_host->socket, (struct sockaddr*)&ss, &len) == -1)
         {
             Log::error("STKHost", "Error while using getsockname().");
@@ -102,6 +105,9 @@ Network::Network(int peer_count, int channel_limit,
                 m_port = ntohs(sin->sin_port);
             }
         }
+#else
+        m_port = 0;
+#endif
     }
 }   // Network
 
@@ -132,6 +138,7 @@ ENetPeer* Network::connectTo(const ENetAddress &address)
 void Network::sendRawPacket(const BareNetworkString &buffer,
                             const SocketAddress& dst)
 {
+#ifndef __wasi__
     sendto(m_host->socket, buffer.getData(), buffer.size(), 0,
         dst.getSockaddr(), dst.getSocklen());
     if (m_connection_debug)
@@ -140,6 +147,7 @@ void Network::sendRawPacket(const BareNetworkString &buffer,
             dst.toString().c_str());
     }
     Network::logPacket(buffer, false);
+#endif
 }   // sendRawPacket
 
 // ----------------------------------------------------------------------------
@@ -168,9 +176,9 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
     struct sockaddr_storage addr = {};
     socklen_t from_len = sizeof(addr);
 
+#ifndef __wasi__
     int len = recvfrom(m_host->socket, buffer, buf_len, 0,
                        (struct sockaddr*)(&addr), &from_len);
-
     int count = 0;
     // wait to receive the message because enet sockets are non-blocking
     while(len < 0 && (count<max_tries || max_tries==-1) )
@@ -180,6 +188,9 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
         len = recvfrom(m_host->socket, buffer, buf_len, 0,
                        (struct sockaddr*)(&addr), &from_len);
     }
+#else
+    int len = -1;
+#endif
 
     // No message received
     if(len<0)

@@ -37,7 +37,9 @@
 #ifndef __SWITCH__
 #include <err.h>
 #endif
+#ifndef __wasi__
 #include <netdb.h>
+#endif
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdlib.h>
@@ -414,6 +416,8 @@ extern "C" int getaddrinfo_compat(const char* hostname,
         }
     }
     return err;
+#elif defined(__wasi__)
+    return -1;
 #else
     return getaddrinfo(hostname, servname, hints, res);
 #endif

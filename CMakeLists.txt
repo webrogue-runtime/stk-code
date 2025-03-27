@@ -643,8 +643,8 @@ endif()
 # 1.0.1d for compatible AES GCM handling
 SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 
-find_package(CURL REQUIRED)
-include_directories(${CURL_INCLUDE_DIRS})
+# find_package(CURL REQUIRED)
+# include_directories(${CURL_INCLUDE_DIRS})
 
 find_path(MBEDTLS_INCLUDE_DIRS mbedtls/version.h)
 find_library(MBEDCRYPTO_LIBRARY NAMES mbedcrypto libmbedcrypto)
@@ -679,11 +679,9 @@ target_link_libraries(supertuxkart
     ${ENET_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
-    ${CURL_LIBRARIES}
+    # ${CURL_LIBRARIES}
     ${MCPP_LIBRARY}
-    /wasix-sysroot/lib/wasm32-wasi/libc++abi.a
-    /wasix-sysroot/lib/wasm32-wasi/libc++experimental.a
-    /host_dir/examples/dest/lib/libwebrogue_gfx.a
+    webrogue_gfx
     )
 
 if (USE_SWITCH)
@@ -935,3 +933,4 @@ if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
             FILES_MATCHING PATTERN "*.dll")
 endif()
+target_link_options(supertuxkart PRIVATE -Wl,--max-memory=16777216)

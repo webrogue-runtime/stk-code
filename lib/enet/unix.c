@@ -2,7 +2,7 @@
  @file  unix.c
  @brief ENet Unix system specific functions
 */
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__wasi__)
 
 #include <sys/types.h>
 #include <sys/socket.h>

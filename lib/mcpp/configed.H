@@ -373,7 +373,13 @@
 #include    "string.h"
 #include    "stdlib.h"
 #include    "time.h"
+#ifndef __wasi__
 #include    "setjmp.h"
+#else
+#define jmp_buf void*
+#define setjmp(x) 0
+#define longjmp(x, y) __builtin_unreachable()
+#endif
 
 /* For debugging malloc systems by kmatsui  */
 #if     KMMALLOC && _MEM_DEBUG

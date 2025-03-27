@@ -61,7 +61,9 @@ extern "C" {
   #undef s64
 }
 #endif
+#ifndef __wasi__
 #  include <net/if.h>
+#endif
 #endif
 
 static ServersManager* g_manager_singleton(NULL);

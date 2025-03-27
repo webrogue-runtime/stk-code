@@ -156,7 +156,7 @@
 #  ifdef _MSC_VER
 #    include <direct.h>
 #  endif
-#else
+#elif !defined(__wasi__)
 #  include <signal.h>
 #  include <unistd.h>
 #endif
@@ -2162,7 +2162,7 @@ int main(int argc, char *argv[])
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__wasi__)
     signal(SIGTERM, [](int signum)
         {
             main_abort();

@@ -19,7 +19,9 @@ extern "C" {
 	#else
 	#include "jpeglib/jpeglib.h" // use irrlicht jpeglib
 	#endif
+#ifndef __wasi__
 	#include <setjmp.h>
+#endif
 }
 #endif // _IRR_COMPILE_WITH_LIBJPEG_
 

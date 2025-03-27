@@ -56,8 +56,10 @@
 #  include <arpa/nameser.h>
 #  include <arpa/nameser_compat.h>
 #endif
+#ifndef __wasi__
 #  include <netdb.h>
 #  include <netinet/in.h>
+#endif
 #ifndef __SWITCH__
 // #  include <resolv.h>
 #endif
@@ -94,6 +96,7 @@ bool NetworkConfig::m_system_ipv6 = false;
 /** Initialize detection of system IPv4 or IPv6 support. */
 void NetworkConfig::initSystemIP()
 {
+#ifndef __wasi__
     // It calls WSAStartup in enet, for the rest new Network function we don't
     // need this because request manager runs curl_global_init which will do
     // WSAStartup too
@@ -129,6 +132,7 @@ void NetworkConfig::initSystemIP()
         ServerConfig::m_ipv6_connection = false;
     }
     enet_deinitialize();
+#endif
 }   // initSystemIP
 
 /** \class NetworkConfig

@@ -35,7 +35,9 @@
 
 #include <atomic>
 #include <condition_variable>
+#ifndef __wasi__
 #include <curl/curl.h>
+#endif
 #include <memory>
 #include <queue>
 #include <thread>

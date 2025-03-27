@@ -41,8 +41,10 @@ extern "C" {
   #undef s64
 }
 #endif
+#ifndef __wasi__
 #  include <sys/ioctl.h>
 #  include <net/if.h>
+#endif
 #  include <string.h>
 #  include <errno.h>
 #endif
@@ -184,6 +186,7 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
         port_str = StringUtils::toString(port_number);
     }
 
+#ifndef __wasi__
     struct addrinfo hints;
     struct addrinfo* res = NULL;
     memset(&hints, 0, sizeof hints);
@@ -252,6 +255,9 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
             break;
     }
     freeaddrinfo(res);
+#else
+    return;
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------

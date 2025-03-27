@@ -62,8 +62,10 @@
 #  include <arpa/nameser.h>
 #  include <arpa/nameser_compat.h>
 #endif
+#ifndef __wasi__
 #  include <netdb.h>
 #  include <netinet/in.h>
+#endif
 #ifndef __SWITCH__
 // #  include <resolv.h>
 #endif

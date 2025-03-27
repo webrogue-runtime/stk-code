@@ -59,7 +59,7 @@
 #ifdef WIN32
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
-#else
+#elif !defined(__wasi__)
 #  include <netdb.h>
 #endif
 #include <sys/types.h>
@@ -451,8 +451,10 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
     constexpr uint32_t magic_cookie = 0x2112A442;
     BareNetworkString s = getStunRequest(stun_tansaction_id);
 
+#ifndef __wasi__
     sendto(socket, s.getData(), s.size(), 0, stun.getSockaddr(),
         stun.getSocklen());
+#endif
 
     // Recieve now
     const int LEN = 2048;
@@ -467,8 +469,12 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
     int count = 0;
     while (len < 0 && count < 2000)
     {
+#ifndef __wasi__
         len = recvfrom(socket, buffer, LEN, 0, addr_rev,
             &from_len);
+#else
+        break;
+#endif
         if (len > 0)
             break;
         count++;

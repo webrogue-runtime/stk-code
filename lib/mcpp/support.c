@@ -2624,7 +2624,9 @@ void    cfatal(
  */
 {
     do_msg( "fatal error", format, arg1, arg2, arg3);
+#ifndef __wasi__
     longjmp( error_exit, -1);
+#endif
 }
 
 void    cerror(

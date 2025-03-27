@@ -27,7 +27,9 @@
 #  include <winsock2.h>
 #endif
 #include <atomic>
+#ifndef __wasi__
 #include <curl/curl.h>
+#endif
 #include <assert.h>
 #include <string>
 
@@ -70,11 +72,13 @@ namespace Online
         std::string m_parameters;
 
 
+#ifndef __wasi__
         /** Pointer to the curl data structure for this request. */
         CURL *m_curl_session = NULL;
 
         /** curl return code. */
         CURLcode m_curl_code;
+#endif
 
         /** String to store the received data in. */
         std::string m_string_buffer;
@@ -108,6 +112,7 @@ namespace Online
         HTTPRequest(const char * const filename, int priority = 1);
         virtual           ~HTTPRequest()
         {
+#ifndef __wasi__
             if (m_http_header)
                 curl_slist_free_all(m_http_header);
             if (m_curl_session)
@@ -115,6 +120,7 @@ namespace Online
                 curl_easy_cleanup(m_curl_session);
                 m_curl_session = NULL;
             }
+#endif
         }
         virtual bool       isAllowedToAdd() const OVERRIDE;
         void               setApiURL(const std::string& url, const std::string &action);
@@ -122,7 +128,13 @@ namespace Online
 
         // ------------------------------------------------------------------------
         /** Returns true if there was an error downloading the file. */
-        virtual bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
+        virtual bool hadDownloadError() const {       
+#ifndef __wasi__
+            return m_curl_code != CURLE_OK;
+else
+            return true;
+#endif
+        }
         // ------------------------------------------------------------------------
         void setDownloadAssetsRequest(bool val)
                                                { m_download_assets_request = val; }
@@ -133,7 +145,11 @@ namespace Online
         const char* getDownloadErrorMessage() const
         {
             assert(hadDownloadError());
+#ifndef __wasi__
             return curl_easy_strerror(m_curl_code);
+#else
+            return "not supported";
+#endif
         }   // getDownloadErrorMessage
 
         // ------------------------------------------------------------------------
@@ -174,11 +190,13 @@ namespace Online
             assert(isPreparing());
             std::string s = StringUtils::toString(value);
 
+#ifndef __wasi__
             char *s1 = curl_easy_escape(m_curl_session, name.c_str(), (int)name.size());
             char *s2 = curl_easy_escape(m_curl_session, s.c_str(), (int)s.size());
             m_parameters.append(std::string(s1) + "=" + s2 + "&");
             curl_free(s1);
             curl_free(s2);
+#endif
         }   // addParameter
 
         // --------------------------------------------------------------------

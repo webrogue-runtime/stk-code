@@ -28,7 +28,10 @@
 #  include <winsock2.h>
 #endif
 
+
+#ifndef __wasi__
 #include <curl/curl.h>
+#endif
 #include <assert.h>
 
 namespace Online
@@ -89,7 +92,9 @@ namespace Online
         m_string_buffer = "";
         m_filename      = "";
         m_parameters    = "";
+#ifndef __wasi__
         m_curl_code     = CURLE_OK;
+#endif
         m_progress.store(0.0f);
         m_total_size.store(-1.0);
         m_disable_sending_log = false;
@@ -152,6 +157,7 @@ namespace Online
      */
     void HTTPRequest::prepareOperation()
     {
+#ifndef __wasi__
         m_curl_session = curl_easy_init();
         if (!m_curl_session)
         {
@@ -188,6 +194,7 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, m_http_header);
         curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
         curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 2L);
+#endif
     }   // prepareOperation
 
     // ------------------------------------------------------------------------
@@ -195,6 +202,7 @@ namespace Online
      */
     void HTTPRequest::operation()
     {
+#ifndef __wasi__
         if (!m_curl_session)
             return;
 
@@ -299,6 +307,7 @@ namespace Online
                 }
             }   // m_curl_code ==CURLE_OK
         }   // if fout
+#endif
     }   // operation
 
     // ------------------------------------------------------------------------
@@ -308,6 +317,7 @@ namespace Online
      */
     void HTTPRequest::afterOperation()
     {
+#ifndef __wasi__
         if (m_curl_code == CURLE_OK)
             setProgress(1.0f);
         else
@@ -324,6 +334,7 @@ namespace Online
             curl_easy_cleanup(m_curl_session);
             m_curl_session = NULL;
         }
+#endif
     }   // afterOperation
 
     // ------------------------------------------------------------------------

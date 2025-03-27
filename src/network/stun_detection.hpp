@@ -60,7 +60,11 @@ public:
         if (sa.isUnset() || (ipv4 && sa.getFamily() != AF_INET) ||
             (!ipv4 && sa.getFamily() != AF_INET6))
             return;
+#ifndef __wasi__
         m_socket = socket(ipv4? AF_INET : AF_INET6, SOCK_STREAM, 0);
+#else
+        return;
+#endif
 #ifdef WIN32
         if (m_socket == INVALID_SOCKET)
             return;
@@ -72,10 +76,14 @@ public:
         m_thread = std::thread([addr, ipv4, sa, this]()
         {
             uint64_t t = StkTime::getMonoTimeMs();
+#ifndef __wasi__
             if (connect(m_socket, sa.getSockaddr(), sa.getSocklen()) == -1)
                 m_connected.store(false);
             else
                 m_connected.store(true);
+#else
+            m_connected.store(false);
+#endif
             shutdown(m_socket, 2);
 #ifdef WIN32
             closesocket(m_socket);
