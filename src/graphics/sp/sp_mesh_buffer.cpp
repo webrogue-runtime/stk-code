@@ -159,7 +159,7 @@ void SPMeshBuffer::uploadGLMesh()
     glBufferData(GL_ARRAY_BUFFER, v_size, NULL, GL_DYNAMIC_DRAW);
     size_t offset = 0;
     char* ptr = (char*)glMapBufferRange(GL_ARRAY_BUFFER, 0, v_size,
-        GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
+        GL_MAP_WRITE_BIT |
         GL_MAP_INVALIDATE_BUFFER_BIT);
     v_size = 0;
     for (unsigned i = 0 ; i < m_vertices.size(); i++)
@@ -408,8 +408,7 @@ void SPMeshBuffer::uploadInstanceData()
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
             void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                m_ins_dat[i].size() * 44, GL_MAP_WRITE_BIT |
-                GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                m_ins_dat[i].size() * 44, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             memcpy(ptr, m_ins_dat[i].data(), m_ins_dat[i].size() * 44);
             glUnmapBuffer(GL_ARRAY_BUFFER);
             glBindBuffer(GL_ARRAY_BUFFER, 0);

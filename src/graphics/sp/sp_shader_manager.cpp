@@ -524,7 +524,7 @@ void SPShaderManager::loadSPShaders(const std::string& directory_name)
         (directory_name.c_str()).c_str();
     for (const std::string& file_name : shaders)
     {
-        loadEachShader(m_shader_directory + file_name);
+        loadEachShader(m_shader_directory + "/" + file_name);
     }
     m_shader_directory = "";
 }   // loadSPShaders

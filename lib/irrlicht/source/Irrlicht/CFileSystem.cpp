@@ -743,6 +743,7 @@ io::path& CFileSystem::flattenFilename(io::path& directory, const io::path& root
 
 		lastpos = pos + 1;
 	}
+	dir[dir.size() - 1] = 0;
 	directory = dir;
 	return directory;
 }

@@ -40,7 +40,6 @@ XMLNode::XMLNode(io::IXMLReader *xml)
  */
 XMLNode::XMLNode(const std::string &filename)
 {
-        std::cout<<"XMLNode::XMLNode("+filename<<'\n';
     m_file_name = filename;
 
     io::IXMLReader *xml = file_manager->createXMLReader(filename);

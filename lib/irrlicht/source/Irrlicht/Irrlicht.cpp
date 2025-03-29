@@ -128,13 +128,10 @@ namespace irr
 #ifdef SERVER_ONLY
 		dev = new CIrrDeviceServer(creation_params);
 #endif
-	std::cerr << "createDevice 1\n";
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
-	std::cerr << "createDevice 2\n";
 		if (creation_params.DeviceType == EIDT_SDL || (!dev && creation_params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceSDL(creation_params);
 #endif
-	std::cerr << "createDevice 3\n";
 
 		if (dev && !dev->getVideoDriver() && creation_params.DriverType != video::EDT_NULL)
 		{
