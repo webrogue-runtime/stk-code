@@ -681,7 +681,7 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     # ${CURL_LIBRARIES}
     ${MCPP_LIBRARY}
-    webrogue_gfx
+    webroguegfx
     )
 
 if (USE_SWITCH)
