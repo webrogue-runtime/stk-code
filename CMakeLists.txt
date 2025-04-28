@@ -933,4 +933,3 @@ if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
             FILES_MATCHING PATTERN "*.dll")
 endif()
-target_link_options(supertuxkart PRIVATE -Wl,--max-memory=134217728)
