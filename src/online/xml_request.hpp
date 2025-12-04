@@ -23,12 +23,6 @@
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
-#ifdef WIN32
-#  include <winsock2.h>
-#endif
-#ifndef __wasi__
-#include <curl/curl.h>
-#endif
 #include <assert.h>
 #include <string>
 

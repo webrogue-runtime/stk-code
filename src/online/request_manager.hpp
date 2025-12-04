@@ -28,16 +28,8 @@
 #include <irrString.h>
 
 #include <string>
-#ifdef WIN32
-#  define WIN32_LEAN_AND_MEAN
-#  include <winsock2.h>
-#endif
-
 #include <atomic>
 #include <condition_variable>
-#ifndef __wasi__
-#include <curl/curl.h>
-#endif
 #include <memory>
 #include <queue>
 #include <thread>

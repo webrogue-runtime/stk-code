@@ -195,9 +195,7 @@ void OnlineScreen::loadList()
         // Date format
         int yyyy, mm, dd;
         sscanf(date.c_str(), "%d-%d-%d", &yyyy, &mm, &dd);
-        date = StringUtils::toString(yyyy) + "-"
-             + StringUtils::toString(mm) + "-"
-             + StringUtils::toString(dd);
+        date = StkTime::toString(yyyy, mm, dd);
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(str.c_str(), icon, 4, false));
@@ -256,6 +254,7 @@ void OnlineScreen::onUpdate(float delta)
 void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
+#ifndef SERVER_ONLY
     if (name == "user-id")
     {
         NetworkConfig::get()->cleanNetworkPlayers();
@@ -345,6 +344,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
         m_entered_server = nullptr;
         new EnterAddressDialog(&m_entered_server);
     }
+#endif
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

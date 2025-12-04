@@ -25,11 +25,13 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/xml_characteristic.hpp"
 #include "utils/log.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>
@@ -116,7 +118,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
         for (auto it = m_current_favorite_status->getAllFavorites().begin();
                 it != m_current_favorite_status->getAllFavorites().end(); it++)
         { // User-defined groups
-            if (it->second.find(kp->getNonTranslatedName()) != it->second.end())
+            if (it->second.find(kp->getIdent()) != it->second.end())
             {
                 groups.push_back(it->first);
             }
@@ -129,13 +131,14 @@ void KartPropertiesManager::removeKart(const std::string &ident)
         it = std::find(m_groups_2_indices_no_custom[groups[i]].begin(),
                        m_groups_2_indices_no_custom[groups[i]].end(),   index);
         // Handle no custom group first
-        assert(it!=m_groups_2_indices_no_custom[groups[i]].end());
-
-        m_groups_2_indices_no_custom[groups[i]].erase(it);
-
-        if(m_groups_2_indices_no_custom[groups[i]].size()==0)
+        if(it!=m_groups_2_indices_no_custom[groups[i]].end())
         {
-            m_groups_2_indices_no_custom.erase(groups[i]);
+            m_groups_2_indices_no_custom[groups[i]].erase(it);
+
+            if(m_groups_2_indices_no_custom[groups[i]].size()==0)
+            {
+                m_groups_2_indices_no_custom.erase(groups[i]);
+            }
         } 
 
         it = std::find(m_groups_2_indices[groups[i]].begin(),
@@ -196,6 +199,11 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
 {
     m_all_kart_dirs.clear();
     std::vector<std::string>::const_iterator dir;
+    if (stk_config->m_min_kart_version > stk_config->m_max_kart_version)
+    {
+        Log::fatal("KartPropertiesManager", "The max kart version "
+            "is smaller than the min kart version!");
+    }
     for(dir = m_kart_search_path.begin(); dir!=m_kart_search_path.end(); dir++)
     {
         // First check if there is a kart in the current directory
@@ -206,6 +214,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
         // --------------------------------------------
         std::set<std::string> result;
         file_manager->listFiles(result, *dir);
+        GUIEngine::reserveLoadingIcons(result.size());
         for(std::set<std::string>::const_iterator subdir=result.begin();
             subdir!=result.end(); subdir++)
         {
@@ -296,20 +305,17 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     }
     catch (std::runtime_error& err)
     {
-        Log::error("[KartPropertiesManager]", "Giving up loading '%s': %s",
-                    config_filename.c_str(), err.what());
-        return false;
-    }
-
-    // If the version of the kart file is not supported,
-    // ignore this .kart file
-    if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
-        kart_properties->getVersion() > stk_config->m_max_kart_version)
-    {
-        Log::warn("[KartPropertiesManager]", "Warning: kart '%s' is not "
-                  "supported by this binary, ignored.",
-                  kart_properties->getIdent().c_str());
-        delete kart_properties;
+        char ver[] = "version";
+        if (strcmp(err.what(), ver) == 0)
+        {
+            Log::warn("[KartPropertiesManager]", "Warning: kart '%s' is not "
+                        "supported by this binary, ignored.", config_filename.c_str());
+        }
+        else
+        {
+            Log::error("[KartPropertiesManager]", "Giving up loading '%s': %s",
+                        config_filename.c_str(), err.what());
+        }
         return false;
     }
 
@@ -317,17 +323,6 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     m_kart_available.push_back(true);
 
     std::vector<std::string> groups=kart_properties->getGroups();
-    if (m_current_favorite_status)
-    {
-        for (auto it = m_current_favorite_status->getAllFavorites().begin();
-                it != m_current_favorite_status->getAllFavorites().end(); it++)
-        { // User-defined groups
-            if (it->second.find(kart_properties->getNonTranslatedName()) != it->second.end())
-            {
-                groups.push_back(it->first);
-            }
-        }
-    }
 
     for(unsigned int g=0; g<groups.size(); g++)
     {
@@ -518,7 +513,7 @@ void KartPropertiesManager::setFavoriteKartStatus(FavoriteStatus *status)
             {
                 for (unsigned int i=0; i<m_karts_properties.size(); i++)
                 {
-                    if (m_karts_properties[i].getNonTranslatedName() == *it_name)
+                    if (m_karts_properties[i].getIdent() == *it_name)
                     {
                         m_groups_2_indices[it->first].push_back(i);
                         break;
@@ -544,13 +539,7 @@ void KartPropertiesManager::setFavoriteKartStatus(FavoriteStatus *status)
         int x = g2i.find(a)->second[0], y = g2i.find(b)->second[0];
         return x == y ? a < b : x < y;
     });
-}   // addFavorite
-
-//-----------------------------------------------------------------------------
-void KartPropertiesManager::clearFavoriteKartStatus()
-{
-    setFavoriteKartStatus(NULL);
-}   // addFavorite
+}   // setFavoriteKartStatus
 
 //-----------------------------------------------------------------------------
 /** Returns true if a kart is available to be selected. A kart is available to
@@ -588,8 +577,7 @@ void KartPropertiesManager::selectKartName(const std::string &kart_name)
  *           determined
  *  \return A vector of indices with the karts in the given group.
  */
-const std::vector<int> KartPropertiesManager::getKartsInGroup(
-                                                          const std::string& g)
+const std::vector<int> KartPropertiesManager::getKartsInGroup(const std::string& g)
 {
     if (g == ALL_KART_GROUPS_ID)
     {
@@ -672,7 +660,8 @@ void KartPropertiesManager::getRandomKartList(int count,
             std::vector<int> karts_in_group =
                 getKartsInGroup(UserConfigParams::m_last_used_kart_group);
 
-            assert(karts_in_group.size() > 0);
+            if (karts_in_group.empty())
+                karts_in_group = getKartsInGroup(DEFAULT_GROUP_NAME);
 
             // first try not to use a kart already used by a player
             for (unsigned int i=0; i<karts_in_group.size(); i++)
@@ -699,8 +688,9 @@ void KartPropertiesManager::getRandomKartList(int count,
 
             assert(random_kart_queue.size() > 0);
 
-            std::random_shuffle(random_kart_queue.begin(),
-                                random_kart_queue.end()   );
+            std::shuffle(random_kart_queue.begin(),
+                         random_kart_queue.end(),
+                         RandomGenerator::getGenerator());
         }
 
         while (count > 0 && random_kart_queue.size() > 0)
@@ -770,7 +760,8 @@ void KartPropertiesManager::onDemandLoadKartTextures(
         {
             for (auto& dir : ingame_karts_folder)
             {
-                if (StringUtils::startsWith(full_path, dir))
+                if (StringUtils::startsWith(full_path, dir) &&
+                    material_manager->getMaterialFor(tex.second))
                 {
                     in_use = true;
                     break;

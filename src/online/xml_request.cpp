@@ -23,13 +23,6 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-#ifdef WIN32
-#  include <winsock2.h>
-#endif
-#ifndef __wasi__
-#include <curl/curl.h>
-#endif
-
 #include <assert.h>
 
 namespace Online

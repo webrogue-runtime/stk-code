@@ -554,6 +554,7 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *urls = root->getNode("urls"))
     {
+        urls->get("stk-website", &m_stk_website_url);
         urls->get("donate", &m_donate_url);
         urls->get("password-reset", &m_password_reset_url);
         urls->get("assets-download", &m_assets_download_url);
@@ -625,7 +626,7 @@ void STKConfig::getAllData(const XMLNode * root)
         msg << "Couldn't load general-kart-defaults: no node.";
         throw std::runtime_error(msg.str());
     }
-    m_default_kart_properties->getAllData(node);
+    m_default_kart_properties->getAllData(node, true /* from stk_config */);
     const XMLNode *child_node = node->getNode("kart-type");
 
     for (unsigned int i = 0; i < child_node->getNumNodes(); ++i)
@@ -633,7 +634,7 @@ void STKConfig::getAllData(const XMLNode * root)
         const XMLNode* type = child_node->getNode(i);
         m_kart_properties[type->getName()] = new KartProperties();
         m_kart_properties[type->getName()]->copyFrom(m_default_kart_properties);
-        m_kart_properties[type->getName()]->getAllData(type);
+        m_kart_properties[type->getName()]->getAllData(type, true /* from stk_config */);
     }
 }   // getAllData
 
