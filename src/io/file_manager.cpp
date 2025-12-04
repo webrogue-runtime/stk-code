@@ -1488,7 +1488,7 @@ void FileManager::listFiles(std::set<std::string>& result,
 
     for (int n = 0; n < (int)files->getFileCount(); n++)
     {
-        result.insert(make_full_path ? (dir + (dir[dir.size() - 1] == '/' ? "" : "/")) + files->getFileName(n).c_str()
+        result.insert(make_full_path ? dir + "/" + files->getFileName(n).c_str()
                                      : files->getFileName(n).c_str());
     }
 

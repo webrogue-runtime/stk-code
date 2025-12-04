@@ -90,7 +90,6 @@ void ItemManager::loadDefaultItemMeshes()
 
         std::string model_filename;
         node->get("model", &model_filename);
-        model_filename = file_manager->getAsset(FileManager::MODEL, model_filename);
 
         scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
         if(!node || model_filename.size()==0 || !mesh)

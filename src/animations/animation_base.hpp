@@ -88,6 +88,7 @@ public:
     // ------------------------------------------------------------------------
     float getAnimationDuration() const         { return m_animation_duration; }
 
+    bool  m_discarded;
 };   // AnimationBase
 
 #endif
