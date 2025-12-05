@@ -117,7 +117,11 @@ const IFileList* CMountPointReader::getFileList() const
 
 void CMountPointReader::buildDirectory()
 {
-	IFileList * list = Parent->createFileList();
+	Path.validate();
+	if (Path.lastChar() != '/')
+		Path.append('/');
+	Path.validate();
+	IFileList * list = Parent->createFileList(Path);
 	if (!list)
 		return;
 
@@ -153,8 +157,12 @@ void CMountPointReader::buildDirectory()
 			{
 				addItem(full, 0, 0, true, 0);
 				Parent->changeWorkingDirectoryTo(pwd);
+				auto oldPath = Path;
+				Path = full;
 				buildDirectory();
-				Parent->changeWorkingDirectoryTo("..");
+				Path = oldPath;
+
+				// Parent->changeWorkingDirectoryTo("..");
 			}
 		}
 	}

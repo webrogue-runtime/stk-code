@@ -1486,9 +1486,11 @@ void FileManager::listFiles(std::set<std::string>& result,
 
     irr::io::IFileList* files = m_file_system->createFileList(dir.c_str());
 
+    const char* separator = dir[dir.size() - 1] == '/' ? "" : "/";
+
     for (int n = 0; n < (int)files->getFileCount(); n++)
     {
-        result.insert(make_full_path ? dir + "/" + files->getFileName(n).c_str()
+        result.insert(make_full_path ? dir + separator + files->getFileName(n).c_str()
                                      : files->getFileName(n).c_str());
     }
 

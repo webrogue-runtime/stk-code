@@ -46,6 +46,7 @@ XMLNode::XMLNode(const std::string &filename)
     
     if (xml == NULL)
     {
+        std::cout << "Cannot find file " << filename << "\n";
         throw std::runtime_error("Cannot find file "+filename);
     }
 

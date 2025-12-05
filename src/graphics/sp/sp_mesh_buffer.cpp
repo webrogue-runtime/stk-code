@@ -159,7 +159,7 @@ void SPMeshBuffer::uploadGLMesh()
     glBufferData(GL_ARRAY_BUFFER, v_size, NULL, GL_DYNAMIC_DRAW);
     size_t offset = 0;
     char* ptr = (char*)glMapBufferRange(GL_ARRAY_BUFFER, 0, v_size,
-        GL_MAP_WRITE_BIT |
+        GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
         GL_MAP_INVALIDATE_BUFFER_BIT);
     if (ptr)
     {

@@ -243,10 +243,11 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             return;
         }
 
+        const char* separator = lib_path[lib_path.size() - 1] == '/' ? "" : "/";
         std::string unique_id = StringUtils::insertValues("library/%s", name.c_str());
-        file_manager->pushTextureSearchPath(lib_path + "/", unique_id);
+        file_manager->pushTextureSearchPath(lib_path + separator, unique_id);
         file_manager->pushModelSearchPath(lib_path);
-        material_manager->pushTempMaterial(lib_path + "/materials.xml");
+        material_manager->pushTempMaterial(lib_path + separator + "materials.xml");
 #ifndef SERVER_ONLY
         if (CVS->isGLSL())
         {

@@ -1170,7 +1170,7 @@ void uploadSkinningMatrices()
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
         g_joint_ptr = (std::array<float, 16>*)
             glMapBufferRange(GL_TEXTURE_BUFFER, 64, (g_skinning_offset - 1) * 64,
-            GL_MAP_WRITE_BIT |
+            GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
             GL_MAP_INVALIDATE_RANGE_BIT);
     }
 #endif
