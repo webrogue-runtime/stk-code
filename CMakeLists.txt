@@ -708,6 +708,7 @@ target_link_libraries(supertuxkart
     ${MCPP_LIBRARY}
     webroguegfx
     EGL
+    vulkan_gfxstream
     )
 
 if (USE_APPLE_NETWORK_LIBRARIES)
