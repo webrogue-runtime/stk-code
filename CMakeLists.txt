@@ -697,6 +697,9 @@ if (NOT USE_APPLE_NETWORK_LIBRARIES)
     endif()
 endif()
 
+include(FindPkgConfig)
+pkg_search_module(VULKAN REQUIRED vulkan)
+# message(FATAL_ERROR ${VULKAN_LIBRARIES})
 # Common library dependencies
 target_link_libraries(supertuxkart
     bulletdynamics
@@ -708,7 +711,7 @@ target_link_libraries(supertuxkart
     ${MCPP_LIBRARY}
     webroguegfx
     EGL
-    vulkan_gfxstream
+    ${VULKAN_LIBRARIES}
     )
 
 if (USE_APPLE_NETWORK_LIBRARIES)

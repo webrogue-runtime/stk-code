@@ -15,7 +15,7 @@
 #ifdef _IRR_COMPILE_WITH_LIBJPEG_
 extern "C" {
 	#ifndef _IRR_USE_NON_SYSTEM_JPEG_LIB_
-	#include <jpeg/jpeglib.h> // use system lib
+	#include <jpeglib.h> // use system lib
 	#else
 	#include "jpeglib/jpeglib.h" // use irrlicht jpeglib
 	#endif

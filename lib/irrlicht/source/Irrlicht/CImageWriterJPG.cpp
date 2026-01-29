@@ -16,8 +16,8 @@
 extern "C"
 {
 #ifndef _IRR_USE_NON_SYSTEM_JPEG_LIB_
-	#include <jpeg/jpeglib.h>
-	#include <jpeg/jerror.h>
+	#include <jpeglib.h>
+	#include <jerror.h>
 #else
 	#include "jpeglib/jpeglib.h"
 	#include "jpeglib/jerror.h"
