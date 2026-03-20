@@ -713,6 +713,7 @@ target_link_libraries(supertuxkart
     EGL
     ${VULKAN_LIBRARIES}
     )
+target_link_options(supertuxkart PUBLIC -Wl,--export=eglGetProcAddress)
 
 if (USE_APPLE_NETWORK_LIBRARIES)
     target_link_libraries(supertuxkart "-framework Foundation -framework CryptoKit" cryptokit_wrapper)
