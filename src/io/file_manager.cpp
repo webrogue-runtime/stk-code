@@ -564,8 +564,6 @@ void FileManager::addRootDirs(const std::string &roots)
 //-----------------------------------------------------------------------------
 io::IXMLReader *FileManager::createXMLReader(const std::string &filename)
 {
-    if(!m_file_system->existFileOnly(filename.c_str()))
-        return nullptr;
     return m_file_system->createXMLReader(filename.c_str());
 }   // getXMLReader
 //-----------------------------------------------------------------------------
@@ -574,8 +572,6 @@ io::IXMLReader *FileManager::createXMLReader(const std::string &filename)
  */
 XMLNode *FileManager::createXMLTree(const std::string &filename)
 {
-    if(!m_file_system->existFileOnly(filename.c_str()))
-        return nullptr;
     try
     {
         XMLNode* node = new XMLNode(filename);

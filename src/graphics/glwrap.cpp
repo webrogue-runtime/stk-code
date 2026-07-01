@@ -45,6 +45,8 @@
 #if defined(USE_GLES2)
 #ifndef __APPLE__
 #include <SDL_video.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
 #endif
 
 #endif

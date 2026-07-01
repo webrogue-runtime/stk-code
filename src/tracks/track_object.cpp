@@ -364,13 +364,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     {
         try
         {
-            auto animator = new ThreeDAnimation(xml_node, this);
-            if(!animator->m_discarded) {
-                m_animator = animator;
-            } else {
-                delete animator;
-            }
-            
+            m_animator = new ThreeDAnimation(xml_node, this);
         }
         catch (std::runtime_error& e)
         {

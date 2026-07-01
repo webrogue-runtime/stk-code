@@ -87,7 +87,7 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
         try
         {
             Track* t = track_manager->getTrack(RaceManager::get()->getTrackName());
-            if (t && file_manager->fileExists(t->getTrackFile(name)))
+            if (t)
             {
                 ParticleKind* newkind = new ParticleKind(t->getTrackFile(name));
                 m_per_track_kinds[name] = newkind;
@@ -107,11 +107,9 @@ ParticleKind* ParticleKindManager::getParticles(const std::string &name)
         try
         {
             std::string path = file_manager->getAsset(FileManager::GFX,name);
-            if(file_manager->fileExists(path)) {
-                ParticleKind* newkind = new ParticleKind(path);
-                m_kinds[name] = newkind;
-                return newkind;
-            }
+            ParticleKind* newkind = new ParticleKind(path);
+            m_kinds[name] = newkind;
+            return newkind;
         }
         catch (std::runtime_error& e)
         {

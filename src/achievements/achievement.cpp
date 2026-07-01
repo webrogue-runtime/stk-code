@@ -31,9 +31,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#include <cstdlib>
 #include <stdlib.h>
-#include <cstdio>
 
 /** Constructur, initialises this object with the data from the
  *  corresponding AchievementInfo.

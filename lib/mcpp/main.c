@@ -343,12 +343,10 @@ int     main
     char *  out_file = NULL;
     char *  stdin_name = "<stdin>";
 
-#ifndef __wasi__
     if (setjmp( error_exit) == -1) {
         errors++;
         goto  fatal_error_exit;
     }
-#endif
 
 #if MCPP_LIB
     /* Initialize global and static variables.  */

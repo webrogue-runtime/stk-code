@@ -27,7 +27,7 @@
 #include <cmath>
 
 
-AnimationBase::AnimationBase(const XMLNode &node): m_discarded(false)
+AnimationBase::AnimationBase(const XMLNode &node)
 {
     float fps=25;
     node.get("fps", &fps);
@@ -44,9 +44,7 @@ AnimationBase::AnimationBase(const XMLNode &node): m_discarded(false)
     if (m_all_ipos.size() == 0)
     {
         // Throw to avoid construction completely
-        // throw std::runtime_error("Empty IPO, discard.");
-        m_discarded = true;
-        return;
+        throw std::runtime_error("Empty IPO, discard.");
     }
     reset();
     calculateAnimationDuration();

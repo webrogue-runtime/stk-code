@@ -123,10 +123,8 @@ int scanhead (FILE * infile, unsigned * image_width, unsigned * image_height) {
         // public jpeg error fields
         struct jpeg_error_mgr pub;
 
-#ifndef __wasi__
         // for longjmp, to return to caller on a fatal error
         jmp_buf setjmp_buffer;
-#endif
     };
 
 void CImageLoaderJPG::init_source (j_decompress_ptr cinfo)
@@ -174,9 +172,7 @@ void CImageLoaderJPG::error_exit (j_common_ptr cinfo)
 	// cinfo->err really points to a irr_error_mgr struct
 	irr_jpeg_error_mgr *myerr = (irr_jpeg_error_mgr*) cinfo->err;
 
-#ifndef __wasi__
 	longjmp(myerr->setjmp_buffer, 1);
-#endif
 }
 
 
@@ -237,21 +233,21 @@ IImage* CImageLoaderJPG::loadImage(io::IReadFile* file, bool skip_checking) cons
 	// compatibility fudge:
 	// we need to use setjmp/longjmp for error handling as gcc-linux
 	// crashes when throwing within external c code
-	// if (setjmp(jerr.setjmp_buffer))
-	// {
-	// 	// If we get here, the JPEG code has signaled an error.
-	// 	// We need to clean up the JPEG object and return.
+	if (setjmp(jerr.setjmp_buffer))
+	{
+		// If we get here, the JPEG code has signaled an error.
+		// We need to clean up the JPEG object and return.
 
-	// 	jpeg_destroy_decompress(&cinfo);
+		jpeg_destroy_decompress(&cinfo);
 
-	// 	delete [] input;
-	// 	// if the row pointer was created, we delete it.
-	// 	if (rowPtr)
-	// 		delete [] rowPtr;
+		delete [] input;
+		// if the row pointer was created, we delete it.
+		if (rowPtr)
+			delete [] rowPtr;
 
-	// 	// return null pointer
-	// 	return 0;
-	// }
+		// return null pointer
+		return 0;
+	}
 
 	// Now we can initialize the JPEG decompression object.
 	jpeg_create_decompress(&cinfo);
