@@ -709,7 +709,7 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${MCPP_LIBRARY}
-    webroguegfx
+    wr4c
     EGL
     ${VULKAN_LIBRARIES}
     )
