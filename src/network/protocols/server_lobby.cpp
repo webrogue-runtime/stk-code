@@ -106,12 +106,12 @@ public:
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
- *  grey background are actual states; nodes in boxes and white background 
+ *  grey background are actual states; nodes in boxes and white background
  *  are functions triggered from a state or triggering potentially a state
  *  change.
  \dot
  digraph interaction {
- node [shape=box]; "Server Constructor"; "playerTrackVote"; "connectionRequested"; 
+ node [shape=box]; "Server Constructor"; "playerTrackVote"; "connectionRequested";
                    "signalRaceStartToClients"; "startedRaceOnClient"; "loadWorld";
  node [shape=ellipse,style=filled,color=lightgrey];
 
@@ -127,7 +127,7 @@ public:
  "playerTrackVote" -> "SELECTING" [label="Not all clients have selected"]
  "playerTrackVote" -> "LOAD_WORLD" [label="All clients have selected; signal load_world to clients"]
  "LOAD_WORLD" -> "loadWorld"
- "loadWorld" -> "WAIT_FOR_WORLD_LOADED" 
+ "loadWorld" -> "WAIT_FOR_WORLD_LOADED"
  "WAIT_FOR_WORLD_LOADED" -> "WAIT_FOR_WORLD_LOADED" [label="Client or server loaded world"]
  "WAIT_FOR_WORLD_LOADED" -> "signalRaceStartToClients" [label="All clients and server ready"]
  "signalRaceStartToClients" -> "WAIT_FOR_RACE_STARTED"
@@ -411,7 +411,7 @@ void ServerLobby::setup()
 
     m_server_has_loaded_world.store(false);
 
-    // Initialise the data structures to detect if all clients and 
+    // Initialise the data structures to detect if all clients and
     // the server are ready:
     resetPeersReady();
     m_timeout.store(std::numeric_limits<int64_t>::max());
@@ -450,6 +450,11 @@ bool ServerLobby::notifyEvent(Event* event)
 void ServerLobby::handleChat(Event* event)
 {
     if (!checkDataSize(event, 1) || !ServerConfig::m_chat) return;
+    if (event->getPeer()->getPlayerProfiles().empty())
+    {
+        Log::warn("ServerLobby", "Ignoring chat from peer without a profile.");
+        return;
+    }
 
     // Update so that the peer is not kicked
     event->getPeer()->updateLastActivity();
@@ -1247,7 +1252,13 @@ void ServerLobby::liveJoinRequest(Event* event)
     if (!spectator)
     {
         auto spectators_by_limit = getSpectatorsByLimit();
-        setPlayerKarts(data, peer);
+        if (!setPlayerKarts(data, peer))
+        {
+            // The kart list is part of the live-join request. Do not continue
+            // with uninitialised kart data after rejecting a malformed list.
+            rejectLiveJoin(peer, BLR_NONE);
+            return;
+        }
 
         std::vector<int> used_id;
         for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
@@ -1703,7 +1714,7 @@ void ServerLobby::update(int ticks)
 //-----------------------------------------------------------------------------
 /** Register this server (i.e. its public address) with the STK server
  *  so that clients can find it. It blocks till a response from the
- *  stk server is received (this function is executed from the 
+ *  stk server is received (this function is executed from the
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
@@ -2342,7 +2353,7 @@ void ServerLobby::checkRaceFinished()
                 player->setOverallTime(overall_time);
             }
             m_result_ns->addUInt32(last_score).addUInt32(cur_score)
-                .addFloat(overall_time);            
+                .addFloat(overall_time);
         }
     }
     else if (RaceManager::get()->modeHasLaps())
@@ -2791,6 +2802,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     // if this is a pending connection
     unsigned total_players = 0;
     unsigned player_count = data.getUInt8();
+    if (player_count == 0)
+    {
+        Log::warn("ServerLobby", "Rejecting connection without a player profile.");
+        peer->reset();
+        return;
+    }
 
     if (is_pending_connection)
     {
@@ -3057,7 +3074,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             profile_name = StringUtils::utf32ToWide({ 0x1F4F1 }) + profile_name;
 
         // Add an hourglass emoji for players waiting because of the player limit
-        if (spectators_by_limit.find(profile->getPeer()) != spectators_by_limit.end()) 
+        if (spectators_by_limit.find(profile->getPeer()) != spectators_by_limit.end())
             profile_name = StringUtils::utf32ToWide({ 0x231B }) + profile_name;
 
         pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
@@ -3309,7 +3326,7 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
         return false;
     }
 
-    // Count number of players 
+    // Count number of players
     float cur_players = 0.0f;
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
@@ -4167,9 +4184,15 @@ void ServerLobby::addLiveJoinPlaceholder(
 }   // addLiveJoinPlaceholder
 
 //-----------------------------------------------------------------------------
-void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
+bool ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
 {
     unsigned player_count = ns.getUInt8();
+    if (player_count > peer->getPlayerProfiles().size())
+    {
+        Log::warn("ServerLobby", "Too many kart entries from %s.",
+            peer->getAddress().toString().c_str());
+        return false;
+    }
     for (unsigned i = 0; i < player_count; i++)
     {
         std::string kart;
@@ -4192,7 +4215,7 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
     }
     if (peer->getClientCapabilities().find("real_addon_karts") ==
         peer->getClientCapabilities().end() || ns.size() == 0)
-        return;
+        return true;
     for (unsigned i = 0; i < player_count; i++)
     {
         KartData kart_data(ns);
@@ -4219,6 +4242,7 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
             player->setKartData(kart_data);
         }
     }
+    return true;
 }   // setPlayerKarts
 
 //-----------------------------------------------------------------------------
@@ -4473,6 +4497,9 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
         auto peer = p.first.lock();
         if (!peer)
             continue;
+	// Spectators should not block ready checks for starting.
+	if (peer->isWaitingForGame() || peer->isSpectator() || peer->alwaysSpectate())
+	    continue;
         if (ignore_ai_peer && peer->isAIPeer())
             continue;
         all_ready = all_ready && p.second;

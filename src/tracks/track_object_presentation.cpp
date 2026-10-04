@@ -760,7 +760,7 @@ void TrackObjectPresentationSound::triggerSound(bool loop)
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationSound::stopSound()
 {
-    if (m_sound != NULL) 
+    if (m_sound != NULL)
         m_sound->stop();
 }   // stopSound
 
@@ -774,7 +774,7 @@ TrackObjectPresentationSound::~TrackObjectPresentationSound()
 }   // ~TrackObjectPresentationSound
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationSound::move(const core::vector3df& xyz, 
+void TrackObjectPresentationSound::move(const core::vector3df& xyz,
                                         const core::vector3df& hpr,
                                         const core::vector3df& scale,
                                         bool isAbsoluteCoord)
@@ -800,7 +800,7 @@ void TrackObjectPresentationSound::setEnable(bool enabled)
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
-                                                     const XMLNode& xml_node, 
+                                                     const XMLNode& xml_node,
                                                      scene::ISceneNode* parent)
                                 : TrackObjectPresentationSceneNode(xml_node)
 {
@@ -851,7 +851,7 @@ void TrackObjectPresentationBillboard::updateGraphics(float dt)
         }
         else
         {
-            int a = (int)(255*(dist - m_fade_out_start) 
+            int a = (int)(255*(dist - m_fade_out_start)
                           / (m_fade_out_end - m_fade_out_start));
             node->setColor(video::SColor(a, 255, 255, 255));
         }
@@ -868,7 +868,7 @@ TrackObjectPresentationBillboard::~TrackObjectPresentationBillboard()
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationParticles::TrackObjectPresentationParticles(
-                                                     const XMLNode& xml_node, 
+                                                     const XMLNode& xml_node,
                                                      scene::ISceneNode* parent)
                                 : TrackObjectPresentationSceneNode(xml_node)
 {
@@ -1015,7 +1015,7 @@ void TrackObjectPresentationParticles::setRate(float rate)
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::TrackObjectPresentationLight(
-                                                     const XMLNode& xml_node, 
+                                                     const XMLNode& xml_node,
                                                      scene::ISceneNode* parent)
                             : TrackObjectPresentationSceneNode(xml_node)
 {
@@ -1177,7 +1177,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
                                                 const core::vector3df& xyz,
                                                 const std::string& script_name,
-                                                float distance) 
+                                                float distance)
                                     : TrackObjectPresentation(xyz)
 {
     m_init_xyz             = xyz;

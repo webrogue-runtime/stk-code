@@ -72,11 +72,11 @@
  online_manager -> "STK Server"
  "STK Server" -> online_manager
  karts -> replay
- replay 
+ replay
  # force karts and tracks on the same level, looks better this way
- subgraph { 
-  rank = same; karts; tracks; 
- } 
+ subgraph {
+  rank = same; karts; tracks;
+ }
 
 }
  \enddot
@@ -324,7 +324,7 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == IRR_KEY_RETURN || 
+                        if (evt.Key == IRR_KEY_RETURN ||
                             evt.Key == IRR_KEY_ESCAPE ||
                             evt.Key == IRR_KEY_SPACE)
                         {
@@ -621,7 +621,8 @@ void cmdLineHelp()
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
-    "       --benchmark        Start Benchmark Mode, save results and exit. \n"
+    "       --benchmark        Start Benchmark Mode, save results and exit.\n"
+    "       --benchmark-file=file Specify which benchmark replay file to use.\n"
     "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
     "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --xmas=n           Toggle Xmas/Christmas mode. n=0 Use current date, n=1, Always enable,\n"
@@ -719,7 +720,7 @@ void cmdLineHelp()
     "       --enable-ssr       Enable screen space reflections.\n"
     "       --disable-ssr      Disable screen space reflections.\n"
     "       --enable-light-scatter  Enable light scattering.\n"
-    "       --disable-light-scatter Disable light scattering.\n"  
+    "       --disable-light-scatter Disable light scattering.\n"
     "       --enable-dynamic-lights Enable advanced pipeline.\n"
     "       --disable-dynamic-lights Disable advanced pipeline.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
@@ -1385,49 +1386,28 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         ServerConfig::m_motd = s;
 
     if (CommandLine::has("--team-choosing"))
-    {
         ServerConfig::m_team_choosing = true;
-    }
     if (CommandLine::has("--no-team-choosing"))
-    {
         ServerConfig::m_team_choosing = false;
-    }
     if (CommandLine::has("--ranked"))
-    {
         ServerConfig::m_ranked = true;
-    }
     if (CommandLine::has("--no-ranked"))
-    {
         ServerConfig::m_ranked = false;
-    }
     if (CommandLine::has("--auto-end"))
-    {
         ServerConfig::m_auto_end = true;
-    }
     if (CommandLine::has("--no-auto-end"))
-    {
         ServerConfig::m_auto_end = false;
-    }
     if (CommandLine::has("--owner-less"))
-    {
         ServerConfig::m_owner_less = true;
-    }
     if (CommandLine::has("--no-owner-less"))
-    {
         ServerConfig::m_owner_less = false;
-    }
     if (CommandLine::has("--firewalled-server"))
-    {
         ServerConfig::m_firewalled_server = true;
-    }
     if (CommandLine::has("--no-firewalled-server"))
-    {
         ServerConfig::m_firewalled_server = false;
-    }
     if (CommandLine::has("--connection-debug"))
-    {
         Network::m_connection_debug = true;
-    }
+
     if (CommandLine::has("--server-id-file", &s))
     {
         NetworkConfig::get()->setServerIdFile(
@@ -1668,6 +1648,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         const std::vector<std::string> l=StringUtils::split(std::string(s),',');
         RaceManager::get()->setDefaultAIKartList(l);
         RaceManager::get()->setNumKarts((int)l.size());
+        RaceManager::get()->setNumPlayers(0);
     }   // --aiNP
 
     if(CommandLine::has("--reverse"))
@@ -1770,38 +1751,33 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         UserConfigParams::m_default_gamepad = n;
     } //--use-gamepad
 
-    if(CommandLine::has("--laps", &s))
+    if(CommandLine::has("--laps", &n))
     {
-        int laps = atoi(s.c_str());
-        if (laps < 0)
+        if (n <= 0)
         {
-            Log::error("main", "Invalid number of laps: %s.\n", s.c_str());
+            Log::error("main", "Invalid number of laps: %i.\n", n);
             return 0;
         }
+
+        Log::verbose("main", "You chose to have %d laps.", n);
+        if (NetworkConfig::get()->isServer())
+            ServerLobby::m_fixed_laps = n;
         else
-        {
-            Log::verbose("main", "You chose to have %d laps.", laps);
-            if (NetworkConfig::get()->isServer())
-                ServerLobby::m_fixed_laps = laps;
-            else
-                RaceManager::get()->setNumLaps(laps);
-        }
+            RaceManager::get()->setNumLaps(n);
     }   // --laps
 
     if(CommandLine::has("--profile-laps",  &n))
     {
-        if (n < 0)
+        if (n <= 0)
         {
             Log::error("main", "Invalid number of profile-laps: %i.", n );
             return 0;
         }
-        else
-        {
-            Log::verbose("main", "Profiling %d laps.",n);
-            UserConfigParams::m_no_start_screen = true;
-            ProfileWorld::setProfileModeLaps(n);
-            RaceManager::get()->setNumLaps(n);
-        }
+
+        Log::verbose("main", "Profiling %d laps.",n);
+        UserConfigParams::m_no_start_screen = true;
+        ProfileWorld::setProfileModeLaps(n);
+        RaceManager::get()->setNumLaps(n);
     }   // --profile-laps
 
     if(CommandLine::has("--benchmark"))
@@ -1810,6 +1786,33 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         UserConfigParams::m_no_start_screen = true;
         UserConfigParams::m_benchmark = true;
     }   // --benchmark
+
+    if(CommandLine::has("--benchmark-file", &s))
+    {
+        Log::verbose("main", "File '%s' requested as benchmark file", s.c_str());
+
+        if (s.find(".replay") != std::string::npos)
+        {
+            bool found_replay = false;
+            for (unsigned int i=0; i < stk_config->m_benchmark_files.size(); i++)
+            {
+                if (stk_config->m_benchmark_files[i] == s)
+                {
+                    found_replay = true;
+                    stk_config->m_active_benchmark_file = s;
+                    break;
+                }
+            }
+            if (!found_replay)
+                Log::error("main","The requested benchmark file '%s' "
+                    "isn't registered as a benchmark file in stk_config.xml.", s.c_str());
+        }
+        else
+        {
+            Log::error("main","The requested benchmark file '%s' "
+                "is not a .replay file.", s.c_str());
+        }
+    }   // --benchmark-file
     
     if(CommandLine::has("--unlock-all"))
     {
@@ -2067,6 +2070,7 @@ void initRest()
     }
 
     track_manager->loadTrackList();
+    stk_config->validateBenchmarkReplays();
     music_manager->addMusicToTracks();
 
     GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI_ICON,
@@ -2093,6 +2097,11 @@ void initRest()
 
     RaceManager::get()->setTrack(UserConfigParams::m_last_track);
 
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+    // Disable text input mode to prevent IMEs from eating inputs (see #5829)
+    // In SDL2, text input mode is on by default (it's off by default in SDL3)
+    SDL_StopTextInput();
+#endif
 }   // initRest
 
 //=============================================================================
@@ -2136,12 +2145,12 @@ void askForInternetPermission()
 
     MessageDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
-        "to download add-ons and notify you of updates. "
-        "Please read our privacy policy at https://supertuxkart.net/Privacy. "
-        "Would you like this feature to be enabled? (To change this setting "
+        "to download add-ons and notify you of updates.") + L"\n\n"
+        + _("Please read our privacy policy at %s.",
+            StringUtils::utf8ToWide(stk_config->m_privacy_url))
+        + L"\n\n" + _("Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
-        "'General', and edit \"Connect to the "
-        "Internet\")."),
+        "'General', and edit \"Connect to the Internet\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.85f, 0.85f);
 
@@ -2373,7 +2382,7 @@ int main(int argc, char *argv[])
         wiimote_manager = new WiimoteManager();
 #endif
 
-        GUIEngine::reserveLoadingIcons(4);
+        GUIEngine::reserveLoadingIcons(1);
         int parent_pid;
         bool has_parent_process = false;
         if (CommandLine::has("--parent-process", &parent_pid))
@@ -2383,19 +2392,11 @@ int main(int argc, char *argv[])
         }
         else
             main_loop = new MainLoop(0/*parent_pid*/);
-        material_manager->loadMaterial();
 
-        // Preload the explosion effects (explode.png)
-        ParticleKindManager::get()->getParticles("explosion.xml");
-        ParticleKindManager::get()->getParticles("explosion_bomb.xml");
-        ParticleKindManager::get()->getParticles("explosion_cake.xml");
-        ParticleKindManager::get()->getParticles("jump_explosion.xml");
+        // Set of loading steps common between the first game launch and
+        // reloading to apply a new resolution.
+        irr_driver->commonInit();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "options_video.png"));
-        kart_properties_manager -> loadAllKarts    ();
-        kart_properties_manager->onDemandLoadKartTextures(
-            { UserConfigParams::m_default_kart }, false/*unload_unused*/);
         OfficialKarts::load();
         handleXmasMode();
         handleEasterEarMode();
@@ -2413,35 +2414,6 @@ int main(int argc, char *argv[])
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
-        ProjectileManager::get()->loadData();
-
-        // Both item_manager and powerup_manager load models and therefore
-        // textures from the model directory. To avoid reading the
-        // materials.xml twice, we do this here once for both:
-        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
-        const std::string materials_file =
-            file_manager->getAsset(FileManager::MODEL,"materials.xml");
-        if(materials_file!="")
-        {
-            // Some of the materials might be needed later, so just add
-            // them all permanently (i.e. as shared). Adding them temporary
-            // will actually not be possible: powerup_manager adds some
-            // permanent icon materials, which would (with the current
-            // implementation) make the temporary materials permanent anyway.
-            material_manager->addSharedMaterial(materials_file);
-        }
-        Referee::init();
-        powerup_manager->loadPowerupsModels();
-        ItemManager::loadDefaultItemMeshes();
-
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "gift.png")       );
-
-        attachment_manager->loadModels();
-        file_manager->popTextureSearchPath();
-
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if (!handleCmdLine(!server_config.empty(), has_parent_process))

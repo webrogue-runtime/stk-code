@@ -280,7 +280,7 @@ void ItemManager::insertItemInQuad(Item *item)
  *  \param server_normal The normal as seen on the server.
  */
 Item* ItemManager::dropNewItem(ItemState::ItemType type,
-                               const AbstractKart *kart, 
+                               const AbstractKart *kart,
                                const Vec3 *server_xyz,
                                const Vec3 *server_normal)
 {
@@ -301,7 +301,7 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 
         // We will get no material if the kart is 'over nothing' when dropping
         // the bubble gum. In most cases this means that the item does not need
-        // to be created (and we just return NULL). 
+        // to be created (and we just return NULL).
         if (!material_hit) return NULL;
         normal.normalize();
         pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);

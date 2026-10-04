@@ -440,7 +440,7 @@ namespace UserConfigParams
             &m_race_setup_group, "Default direction of GP tracks. 0=default, 1=no reverse, 2=all reverse, 3=Random") );
     PARAM_PREFIX IntUserConfigParam          m_rand_gp_num_tracks
             PARAM_DEFAULT(  IntUserConfigParam(1, "random-gp-num-tracks",
-            &m_race_setup_group, "Default number of tracks for random GP.") );            
+            &m_race_setup_group, "Default number of tracks for random GP.") );
     PARAM_PREFIX IntUserConfigParam          m_ffa_time_limit
         PARAM_DEFAULT(IntUserConfigParam(3, "ffa-time-limit",
             &m_race_setup_group, "Time limit in ffa mode."));
@@ -488,7 +488,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-blue-ai-num",
             &m_race_setup_group, "Number of blue AI karts in soccer mode.") );
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );
     PARAM_PREFIX BoolUserConfigParam          m_soccer_player_list
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-player-list",
@@ -1388,7 +1388,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "news_list_shown_id",
                                                &m_addon_group,
                                                "News before this id has been "
-                                               "shown once so no red dot") );      
+                                               "shown once so no red dot") );
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",
@@ -1417,6 +1417,11 @@ namespace UserConfigParams
                         "Enable all karts and tracks: 0 = disabled, "
                         "1 = everything except final race, 2 = everything") );
 
+    PARAM_PREFIX IntUserConfigParam        m_local_username_length
+            PARAM_DEFAULT( IntUserConfigParam(30, "local_username_length",
+                        "The upper character limit for local usernames. "
+                        "Change this at your own risk (of getting UI overflows).") );
+						
     PARAM_PREFIX StringUserConfigParam      m_commandline
             PARAM_DEFAULT( StringUserConfigParam("", "commandline",
                              "Allows one to set commandline args in config file") );

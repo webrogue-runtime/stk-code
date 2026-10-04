@@ -193,6 +193,8 @@
   <urls stk-website="https://supertuxkart.net/Main_Page"
 		donate="https://supertuxkart.net/Donate"
         password-reset="https://online.supertuxkart.net/password-reset.php"
+        terms-and-conditions="https://terms.supertuxkart.net/"
+        privacy-policy="https://supertuxkart.net/Privacy"
         assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
 
   <!-- STK will use dns query of the SRV records with these domains to get the list of
@@ -586,4 +588,10 @@
       <capabilities name="aes_gcm_128bit_tag"/>
       <capabilities name="command_messages"/>
   </network-capabilities>
+
+  <!-- List of replay files that may be used for benchmarking
+    The files should be located in data/replay. -->
+  <benchmark>
+    <file name="benchmark_black_forest.replay"/>
+  </benchmark>
 </config>
