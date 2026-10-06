@@ -135,6 +135,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		if (!Close && createWindow())
 		{
 			SDL_VERSION(&Info.version);
+			int w, h;
+			SDL_GetWindowSize(Window, &w, &h);
+			Width = (u32)w;
+			Height = (u32)h;
 
 #if (defined(IOS_STK) || defined(_IRR_COMPILE_WITH_DIRECT3D_9_)) && !defined(__SWITCH__)
 			// Only iOS or DirectX9 build uses the Info structure
@@ -1550,7 +1554,11 @@ void CIrrDeviceSDL::createKeyMap()
 
 bool CIrrDeviceSDL::supportsTouchDevice() const
 {
+#ifdef __wasi__
+	return true;
+#else
 	return SDL_GetNumTouchDevices() > 0;
+#endif
 }
 
 

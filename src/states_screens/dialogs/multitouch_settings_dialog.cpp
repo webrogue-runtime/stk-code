@@ -208,7 +208,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
 
             if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
             {
-            #ifdef MOBILE_STK
+            #if defined(MOBILE_STK) || defined(__wasi__)
                 UserConfigParams::m_multitouch_draw_gui = true;
             #else
                 UserConfigParams::m_multitouch_draw_gui.revertToDefaults();

@@ -267,7 +267,7 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(NOT SERVER_ONLY)
-    if (IOS)
+    if (IOS OR WASI)
         find_library(SHADERC_LIBRARY NAMES shaderc_combined libshaderc_combined)
     else()
         find_library(SHADERC_LIBRARY NAMES shaderc_shared libshaderc_shared shaderc libshaderc)
@@ -727,10 +727,9 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     ${MCPP_LIBRARY}
     wr4c
-    EGL
     ${VULKAN_LIBRARIES}
     )
-target_link_options(supertuxkart PUBLIC -Wl,--export=eglGetProcAddress)
+target_link_options(supertuxkart PUBLIC -Wl,--export=vkGetInstanceProcAddr)
 
 if (USE_APPLE_NETWORK_LIBRARIES)
     target_link_libraries(supertuxkart "-framework Foundation -framework CryptoKit" cryptokit_wrapper)

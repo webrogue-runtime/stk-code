@@ -65,7 +65,11 @@ GEConfig* getGEConfig()
 
 void setShaderFolder(const std::string& path)
 {
-    g_shader_folder = path + "ge_shaders/";
+    g_shader_folder = path;
+    if (!g_shader_folder.empty() && g_shader_folder.back() != '/' &&
+        g_shader_folder.back() != '\\')
+        g_shader_folder += "/";
+    g_shader_folder += "ge_shaders/";
 }
 
 const std::string& getShaderFolder()

@@ -2222,7 +2222,11 @@ int ios_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
+#if defined(__wasi__)
+    UserConfigParams::m_multitouch_draw_gui = true;
+#endif
 #ifdef __SWITCH__
+
     constexpr devoptab_t dotab_stdout = {
         .name    = "con",
         .write_r = dotab_stdout_fn,
